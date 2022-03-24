@@ -3,6 +3,7 @@ package com.bruceewu.callrejector;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -21,24 +22,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ToastUtils.init(this);
-        checkPermission(() -> register());
+        checkNormalPermission(() -> checkSinglePermission(() -> register()));
     }
 
     @SuppressLint("CheckResult")
-    private void checkPermission(Runnable next) {
+    private void checkNormalPermission(Runnable next) {
         new RxPermissions(this)
-                .request(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CALL_LOG, Manifest.permission.CALL_PHONE)
+                .request(
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.READ_CALL_LOG,
+                        Manifest.permission.CALL_PHONE
+                )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(grant -> {
                     if (grant) {
                         LogUtils.log("权限授予成功！");
                         next.run();
                     } else {
-                        ToastUtils.show("Permission denied");
+                        ToastUtils.show("获取权限失败！");
                     }
                 }, error -> {
                     ToastUtils.show(error.getMessage());
                 });
+    }
+
+    @SuppressLint("CheckResult")
+    private void checkSinglePermission(Runnable next) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            new RxPermissions(this)
+                    .request(Manifest.permission.ANSWER_PHONE_CALLS
+                    )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(grant -> {
+                        if (grant) {
+                            LogUtils.log("权限授予成功！");
+                            next.run();
+                        } else {
+                            ToastUtils.show("获取权限失败！");
+                        }
+                    }, error -> {
+                        ToastUtils.show(error.getMessage());
+                    });
+        } else {
+            next.run();
+        }
     }
 
     private void register() {

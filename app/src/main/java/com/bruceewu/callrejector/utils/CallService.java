@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.telecom.TelecomManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -57,7 +58,16 @@ public class CallService extends Service {
      * 拒绝接听
      */
     private void rejectCall() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            try {
+                LogUtils.log("拒接开始0！");
+                TelecomManager telecomManager = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
+                telecomManager.endCall();
+                LogUtils.log("拒接成功！");
+            } catch (Exception ex) {
+                LogUtils.log("拒接失败!" + ex.getMessage());
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 LogUtils.log("拒接开始1！");
                 Method method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
