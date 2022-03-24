@@ -26,6 +26,11 @@
         </activity>
 
         <service android:name=".utils.CallService" />
+        <receiver android:name=".utils.CallReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

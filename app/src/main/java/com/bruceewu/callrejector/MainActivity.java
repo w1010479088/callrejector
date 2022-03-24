@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
                 .request(
                         Manifest.permission.READ_PHONE_STATE,
                         Manifest.permission.READ_CALL_LOG,
-                        Manifest.permission.CALL_PHONE
+                        Manifest.permission.CALL_PHONE,
+                        Manifest.permission.PROCESS_OUTGOING_CALLS
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(grant -> {
