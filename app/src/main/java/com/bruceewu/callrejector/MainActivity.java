@@ -8,32 +8,36 @@ import android.os.Bundle;
 
 import com.bruceewu.callrejector.utils.CallService;
 import com.bruceewu.callrejector.utils.LogUtils;
+import com.bruceewu.callrejector.utils.ToastUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MainActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkPermission();
+        ToastUtils.init(this);
+        checkPermission(() -> register());
     }
 
     @SuppressLint("CheckResult")
-    private void checkPermission() {
+    private void checkPermission(Runnable next) {
         new RxPermissions(this)
-                .request(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CALL_LOG)
+                .request(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CALL_LOG, Manifest.permission.CALL_PHONE)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(grant -> {
                     if (grant) {
-                        register();
+                        LogUtils.log("权限授予成功！");
+                        next.run();
                     } else {
-                        LogUtils.log("Permission denied");
+                        ToastUtils.show("Permission denied");
                     }
                 }, error -> {
-                    LogUtils.log(error.getMessage());
+                    ToastUtils.show(error.getMessage());
                 });
     }
 

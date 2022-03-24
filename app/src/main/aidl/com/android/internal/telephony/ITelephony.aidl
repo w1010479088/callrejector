@@ -16,6 +16,7 @@
 
 package com.android.internal.telephony;
 
+
 /**
  * Interface used to interact with the phone.  Mostly this is used by the
  * TelephonyManager class.  A few places are still using this directly.
@@ -24,28 +25,5 @@ package com.android.internal.telephony;
  * {@hide}
  */
 interface ITelephony {
-
-    /**
-     * Dial a number. This doesn't place the call. It displays
-     * the Dialer screen.
-     * @param number the number to be dialed. If null, this
-     * would display the Dialer screen with no number pre-filled.
-     */
-    void dial(String number);
-
-    /**
-     * Place a call to the specified number.
-     * @param callingPackage The package making the call.
-     * @param number the number to be called.
-     */
-    void call(String callingPackage, String number);
-
-    /**
-     * End call if there is a call in progress, otherwise does nothing.
-     *
-     * @return whether it hung up
-     */
     boolean endCall();
-
-    void answerRingingCall();
 }

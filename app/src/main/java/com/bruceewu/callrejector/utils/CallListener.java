@@ -18,19 +18,13 @@ public class CallListener extends PhoneStateListener {
                 listener.onRing(mobile);
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK://通话状态,没有标记呼入还是呼出
-                listener.onLine(mobile);
                 break;
             case TelephonyManager.CALL_STATE_IDLE://空闲状态，没有区分是挂断空闲，还是没有通话的空闲
-                listener.onIdle(mobile);
                 break;
         }
     }
 
     public interface Listener {
         void onRing(String mobile);
-
-        void onLine(String mobile);
-
-        void onIdle(String mobile);
     }
 }
