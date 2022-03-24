@@ -2,13 +2,13 @@ package com.bruceewu.callrejector;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Switch;
 
-import com.bruceewu.callrejector.utils.CallService;
 import com.bruceewu.callrejector.utils.LogUtils;
+import com.bruceewu.callrejector.utils.SharePreferenceUtils;
 import com.bruceewu.callrejector.utils.ToastUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -21,8 +21,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+    }
+
+    private void initView() {
         ToastUtils.init(this);
-        checkNormalPermission(() -> checkSinglePermission(() -> register()));
+        ((Switch) findViewById(R.id.open)).setChecked(SharePreferenceUtils.needInterrupt());
+        ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharePreferenceUtils.setInterrupt(isChecked);
+        });
+        checkNormalPermission(() -> checkSinglePermission(() -> LogUtils.log("权限授予成功！")));
     }
 
     @SuppressLint("CheckResult")
@@ -37,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(grant -> {
                     if (grant) {
-                        LogUtils.log("权限授予成功！");
                         next.run();
                     } else {
                         ToastUtils.show("获取权限失败！");
@@ -56,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(grant -> {
                         if (grant) {
-                            LogUtils.log("权限授予成功！");
                             next.run();
                         } else {
                             ToastUtils.show("获取权限失败！");
@@ -67,9 +73,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             next.run();
         }
-    }
-
-    private void register() {
-        startService(new Intent(this, CallService.class));
     }
 }

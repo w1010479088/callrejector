@@ -17,14 +17,14 @@ public class CallService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        LogUtils.log("CallService onCreate");
         rejector = new CallRejector(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LogUtils.log("CallService onDestroy");
-        rejector.unRegister();
+        if (rejector != null) {
+            rejector.unRegister();
+        }
     }
 }

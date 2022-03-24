@@ -18,8 +18,7 @@ public class CallRejector {
     private final TelephonyManager manager;
 
     private final CallListener listener = new CallListener(mobile -> {
-        LogUtils.log(mobile);
-        rejectCall();
+        filter(mobile, this::rejectCall);
     });
 
     public CallRejector(Context context) {
@@ -32,12 +31,20 @@ public class CallRejector {
         manager.listen(listener, PhoneStateListener.LISTEN_NONE);
     }
 
+    //TODO 需要检验手机号是不是黑名单
+    private void filter(String mobile, Runnable next) {
+        LogUtils.log(mobile);
+        next.run();
+    }
+
     private void register() {
         manager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 
     //拒接
     private void rejectCall() {
+        if (!SharePreferenceUtils.needInterrupt()) return;  //如果设置不拒接
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             try {
                 LogUtils.log("拒接开始0！");
