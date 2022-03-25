@@ -3,11 +3,13 @@ package com.bruceewu.callrejector.utils;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.bruceewu.callrejector.App;
+
 public class ToastUtils {
     private static Context context;
 
-    public static void init(Context context) {
-        ToastUtils.context = context;
+    static {
+        ToastUtils.context = App.getInstance();
     }
 
     public static void show(String content) {

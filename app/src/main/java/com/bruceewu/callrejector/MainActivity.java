@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        ToastUtils.init(this);
         ((Switch) findViewById(R.id.open)).setChecked(SharePreferenceUtils.needInterrupt());
         ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             SharePreferenceUtils.setInterrupt(isChecked);

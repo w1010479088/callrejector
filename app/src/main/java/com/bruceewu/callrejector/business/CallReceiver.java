@@ -1,4 +1,4 @@
-package com.bruceewu.callrejector.utils;
+package com.bruceewu.callrejector.business;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +10,7 @@ public class CallReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!TextUtils.equals(intent.getAction(), Intent.ACTION_NEW_OUTGOING_CALL)) {
-            new CallRejector(context);
+            CallRejector.newInstance(context);
         }
     }
 }
