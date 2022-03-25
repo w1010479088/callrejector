@@ -7,9 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Switch;
 
+import com.bruceewu.callrejector.business.CallFilter;
 import com.bruceewu.callrejector.utils.LogUtils;
 import com.bruceewu.callrejector.utils.SharePreferenceUtils;
 import com.bruceewu.callrejector.utils.ToastUtils;
+import com.google.gson.Gson;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,7 +31,13 @@ public class MainActivity extends AppCompatActivity {
         ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             SharePreferenceUtils.setInterrupt(isChecked);
         });
-        checkNormalPermission(() -> checkSinglePermission(() -> LogUtils.log("权限授予成功！")));
+        checkNormalPermission(() -> checkSinglePermission(() -> {
+            LogUtils.log("权限授予成功！");
+            CallFilter.getInstance().add("175");
+            CallFilter.getInstance().del("151");
+            CallFilter.getInstance().add("898");
+            LogUtils.log(new Gson().toJson(CallFilter.getInstance().get()));
+        }));
     }
 
     @SuppressLint("CheckResult")

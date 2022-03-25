@@ -8,6 +8,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.ITelephony;
+import com.bruceewu.callrejector.utils.DoubleClickHelper;
 import com.bruceewu.callrejector.utils.LogUtils;
 import com.bruceewu.callrejector.utils.SharePreferenceUtils;
 
@@ -20,12 +21,19 @@ public class CallRejector {
     private final TelephonyManager manager;
 
     private final CallListener listener = new CallListener(mobile -> {
-        filter(mobile, this::rejectCall);
+        LogUtils.log(mobile);
+        DoubleClickHelper.click("listener", () -> {
+            if (SharePreferenceUtils.needInterrupt()) {//是否需要拦截
+                CallFilter.filter(mobile, () -> {
+                    reject();
+                    showNotification();
+                });
+            }
+        });
     });
 
-    //TODO 需要过滤一下，防抖操作
     public static void newInstance(Context context) {
-        new CallRejector(context);
+        DoubleClickHelper.click("newInstance", () -> new CallRejector(context));
     }
 
     private CallRejector(Context context) {
@@ -34,17 +42,13 @@ public class CallRejector {
         register();
     }
 
-    //TODO 需要检验手机号是不是黑名单
     //TODO 需要弹一个通知，告诉拦截成功
-    private void filter(String mobile, Runnable next) {
-        LogUtils.log(mobile);
-        next.run();
+    private void showNotification() {
+
     }
 
     //拒接
-    private void rejectCall() {
-        if (!SharePreferenceUtils.needInterrupt()) return;  //如果设置不拒接
-
+    private void reject() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             rejectP();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -97,6 +101,7 @@ public class CallRejector {
         manager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 
+    //暂且不需要
     private void unRegister() {
         manager.listen(listener, PhoneStateListener.LISTEN_NONE);
     }
