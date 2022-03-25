@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# 'com.github.w1010479088:RecyclerViewConfigor:1.7.0'对应的混淆
+# ViewHolder需要的混淆配置 recyclerviewconfig,现在的RecyclerView已经属于SDK里面的东西了,需要注意
+-keep class com.bruceewu.configor.**{*;}
+-keep class android.view.View

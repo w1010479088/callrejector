@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/btn_solid_r10_white"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:ignore="HardcodedText">
+
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginVertical="10dp"
+        android:background="@drawable/btn_solid_r10_grey"
+        android:hint="请输入需要添加的号码前缀"
+        android:paddingHorizontal="20dp"
+        android:textColorHint="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/confirm"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/btn_solid_r10_black"
+        android:gravity="center"
+        android:text="确认"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</LinearLayout>

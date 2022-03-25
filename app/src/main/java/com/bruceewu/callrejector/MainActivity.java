@@ -8,11 +8,19 @@ import android.os.Bundle;
 import android.widget.Switch;
 
 import com.bruceewu.callrejector.business.CallFilter;
+import com.bruceewu.callrejector.ui.CardHolder;
+import com.bruceewu.callrejector.ui.DialogHelper;
 import com.bruceewu.callrejector.utils.LogUtils;
 import com.bruceewu.callrejector.utils.SharePreferenceUtils;
 import com.bruceewu.callrejector.utils.ToastUtils;
+import com.bruceewu.configor.RecyclerViewConfigor;
+import com.bruceewu.configor.entity.DisplayItem;
+import com.bruceewu.configor.holder.DefaultHolders;
 import com.google.gson.Gson;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -24,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initList();
     }
 
     private void initView() {
@@ -33,11 +42,54 @@ public class MainActivity extends AppCompatActivity {
         });
         checkNormalPermission(() -> checkSinglePermission(() -> {
             LogUtils.log("权限授予成功！");
-            CallFilter.getInstance().add("175");
-            CallFilter.getInstance().del("151");
-            CallFilter.getInstance().add("898");
             LogUtils.log(new Gson().toJson(CallFilter.getInstance().get()));
         }));
+        findViewById(R.id.add).setOnClickListener(v -> add());
+    }
+
+    private RecyclerViewConfigor configor;
+    private final List<DisplayItem> uis = new ArrayList<>();
+
+    private void initList() {
+        DisplayItem flowItem = DisplayItem.newItem(DefaultHolders.Flow.showType());
+        flowItem.setChildren(uis);
+        configor = new RecyclerViewConfigor
+                .Builder()
+                .buildRecyclerView(findViewById(R.id.list))
+                .buildRefresh(false)
+                .buildLoadMore(false)
+                .buildScrollType(RecyclerViewConfigor.ScrollType.Vertical)
+                .buildClickListener(this::itemClick)
+                .build();
+        List<DisplayItem> result = new ArrayList<>();
+        result.add(flowItem);
+        configor.set(result);
+        refresh();
+    }
+
+    private void refresh() {
+        uis.clear();
+        List<Integer> items = CallFilter.getInstance().get();
+        for (Integer item : items) {
+            uis.add(CardHolder.newInstance(String.valueOf(item)));
+        }
+        configor.refresh();
+    }
+
+    private void itemClick(DisplayItem item) {
+        DialogHelper.show(this,
+                String.format("将%s从黑明单中移除？", item.showData()),
+                () -> {
+                    CallFilter.getInstance().del(item.showData());
+                    refresh();
+                });
+    }
+
+    private void add() {
+        DialogHelper.add(this, input -> {
+            CallFilter.getInstance().add(input);
+            refresh();
+        });
     }
 
     @SuppressLint("CheckResult")
