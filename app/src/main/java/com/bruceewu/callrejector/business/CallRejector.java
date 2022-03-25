@@ -3,11 +3,13 @@ package com.bruceewu.callrejector.business;
 import android.content.Context;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.telecom.TelecomManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.ITelephony;
+import com.bruceewu.callrejector.ui.NotificationHelper;
 import com.bruceewu.callrejector.utils.DoubleClickHelper;
 import com.bruceewu.callrejector.utils.LogUtils;
 import com.bruceewu.callrejector.utils.SharePreferenceUtils;
@@ -17,7 +19,7 @@ import java.lang.reflect.Method;
 import static android.content.Context.TELEPHONY_SERVICE;
 
 public class CallRejector {
-    private final Context context;
+    private Context context;
     private final TelephonyManager manager;
 
     private final CallListener listener = new CallListener(mobile -> {
@@ -26,7 +28,9 @@ public class CallRejector {
             if (SharePreferenceUtils.needInterrupt()) {//是否需要拦截
                 CallFilter.filter(mobile, () -> {
                     reject();
-                    showNotification();
+                    if (context != null) {
+                        NotificationHelper.show(context, String.format("已帮您拦截号码：%s", mobile));
+                    }
                 });
             }
         });
@@ -42,11 +46,6 @@ public class CallRejector {
         register();
     }
 
-    //TODO 需要弹一个通知，告诉拦截成功
-    private void showNotification() {
-
-    }
-
     //拒接
     private void reject() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -58,6 +57,7 @@ public class CallRejector {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private void rejectP() {
         try {
             LogUtils.log("拒接开始0！");

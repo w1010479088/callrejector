@@ -13,8 +13,6 @@ public class InputDialog extends BaseDialog {
 
     public static void show(Context context, ValueCallback<String> listener) {
         InputDialog dialog = new InputDialog(context);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(true);
         dialog.show();
         dialog.listener = listener;
     }
@@ -37,6 +35,8 @@ public class InputDialog extends BaseDialog {
 
     @Override
     protected void initView() {
+        setCancelable(true);
+        setCanceledOnTouchOutside(true);
         mHelper.setClick(R.id.confirm, () -> {
             EditText inputView = mHelper.getView(R.id.input);
             String input = inputView.getText().toString();
@@ -44,7 +44,7 @@ public class InputDialog extends BaseDialog {
                 dismiss();
                 listener.onReceiveValue(input);
             } else {
-                ToastUtils.show("请输入。。。。");
+                ToastUtils.show("请输入...");
             }
         });
     }

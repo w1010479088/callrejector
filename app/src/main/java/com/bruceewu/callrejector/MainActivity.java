@@ -10,13 +10,11 @@ import android.widget.Switch;
 import com.bruceewu.callrejector.business.CallFilter;
 import com.bruceewu.callrejector.ui.CardHolder;
 import com.bruceewu.callrejector.ui.DialogHelper;
-import com.bruceewu.callrejector.utils.LogUtils;
 import com.bruceewu.callrejector.utils.SharePreferenceUtils;
 import com.bruceewu.callrejector.utils.ToastUtils;
 import com.bruceewu.configor.RecyclerViewConfigor;
 import com.bruceewu.configor.entity.DisplayItem;
 import com.bruceewu.configor.holder.DefaultHolders;
-import com.google.gson.Gson;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
@@ -37,12 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         ((Switch) findViewById(R.id.open)).setChecked(SharePreferenceUtils.needInterrupt());
-        ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharePreferenceUtils.setInterrupt(isChecked);
-        });
+        ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> SharePreferenceUtils.setInterrupt(isChecked));
         checkNormalPermission(() -> checkSinglePermission(() -> {
-            LogUtils.log("权限授予成功！");
-            LogUtils.log(new Gson().toJson(CallFilter.getInstance().get()));
         }));
         findViewById(R.id.add).setOnClickListener(v -> add());
     }
