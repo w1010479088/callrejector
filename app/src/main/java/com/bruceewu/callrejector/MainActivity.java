@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initPreFix();
         initList();
     }
 
@@ -39,7 +40,58 @@ public class MainActivity extends AppCompatActivity {
         checkNormalPermission(() -> checkSinglePermission(() -> {
         }));
         findViewById(R.id.add).setOnClickListener(v -> add());
+        findViewById(R.id.addPreFix).setOnClickListener(v -> addPreFix());
     }
+
+
+    //------------------------------通用前缀------------------------------
+
+    private RecyclerViewConfigor configorPreFix;
+    private final List<DisplayItem> uisPreFix = new ArrayList<>();
+
+    private void initPreFix() {
+        DisplayItem flowItem = DisplayItem.newItem(DefaultHolders.Flow.showType());
+        flowItem.setChildren(uisPreFix);
+        configorPreFix = new RecyclerViewConfigor
+                .Builder()
+                .buildRecyclerView(findViewById(R.id.listPreFix))
+                .buildRefresh(false)
+                .buildLoadMore(false)
+                .buildScrollType(RecyclerViewConfigor.ScrollType.Vertical)
+                .buildClickListener(this::itemClickPreFix)
+                .build();
+        List<DisplayItem> result = new ArrayList<>();
+        result.add(flowItem);
+        configorPreFix.set(result);
+        refreshPreFix();
+    }
+
+    private void refreshPreFix() {
+        uisPreFix.clear();
+        List<String> items = CallFilter.getInstance().getPreFixs();
+        for (String item : items) {
+            uisPreFix.add(CardHolder.newInstance(item));
+        }
+        configorPreFix.refresh();
+    }
+
+    private void itemClickPreFix(DisplayItem item) {
+        DialogHelper.show(this,
+                String.format("将%s从通用前缀中移除？", item.showData()),
+                () -> {
+                    CallFilter.getInstance().delPreFix(item.showData());
+                    refreshPreFix();
+                });
+    }
+
+    private void addPreFix() {
+        DialogHelper.add(this, input -> {
+            CallFilter.getInstance().addPreFix(input);
+            refreshPreFix();
+        });
+    }
+
+    //------------------------------黑名单相关------------------------------
 
     private RecyclerViewConfigor configor;
     private final List<DisplayItem> uis = new ArrayList<>();
@@ -63,9 +115,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void refresh() {
         uis.clear();
-        List<Integer> items = CallFilter.getInstance().get();
-        for (Integer item : items) {
-            uis.add(CardHolder.newInstance(String.valueOf(item)));
+        List<String> items = CallFilter.getInstance().get();
+        for (String item : items) {
+            uis.add(CardHolder.newInstance(item));
         }
         configor.refresh();
     }
@@ -85,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
             refresh();
         });
     }
+
+    //--------------------------------------权限相关------------------------------------------
 
     @SuppressLint("CheckResult")
     private void checkNormalPermission(Runnable next) {

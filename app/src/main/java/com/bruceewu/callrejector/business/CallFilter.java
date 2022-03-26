@@ -8,12 +8,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CallFilter {
 
-    private final List<Integer> tags = new ArrayList<>();
+    private final List<String> tags = new ArrayList<>();
     private final List<String> preFixs = new ArrayList<>();//号码前缀，无效的号段，需要过滤一下
 
     private static class HOLDER {
@@ -25,27 +24,31 @@ public class CallFilter {
     }
 
     private CallFilter() {
-        try {
-            {
-                preFixs.add("+");
-                preFixs.add("86");
-                preFixs.add("0");
+        tryCatch(() -> {
+            {//preFixs
+                String preFix = SharePreferenceUtils.getCallPreFix();
+                if (!TextUtils.isEmpty(preFix)) {
+                    List<String> temps = new Gson().fromJson(preFix, new TypeToken<List<String>>() {
+                    }.getType());
+                    if (!temps.isEmpty()) {
+                        preFixs.clear();
+                        preFixs.addAll(temps);
+                    }
+                }
             }
 
-            {
+            {//黑名单
                 String callList = SharePreferenceUtils.getCallList();
                 if (!TextUtils.isEmpty(callList)) {
-                    List<Integer> temps = new Gson().fromJson(callList, new TypeToken<List<Integer>>() {
+                    List<String> temps = new Gson().fromJson(callList, new TypeToken<List<String>>() {
                     }.getType());
-                    if (temps.size() != 0) {
+                    if (!temps.isEmpty()) {
                         tags.clear();
                         tags.addAll(temps);
                     }
                 }
             }
-        } catch (Exception ex) {
-            LogUtils.log(ex.getMessage());
-        }
+        });
     }
 
     public static void filter(String mobile, Runnable next) {
@@ -54,19 +57,23 @@ public class CallFilter {
         }
     }
 
-    //升序一下
-    public List<Integer> get() {
-        Collections.sort(tags, (o1, o2) -> o1 - o2);
+    public List<String> get() {
         return tags;
+    }
+
+    public List<String> getPreFixs() {
+        return preFixs;
     }
 
     //是否指定前缀开头
     public boolean has(String mobile) {
         if (!TextUtils.isEmpty(mobile)) {
             String fixedMobile = fix(mobile);
-            for (Integer tag : tags) {
-                if (fixedMobile.startsWith(String.valueOf(tag))) {
-                    return true;
+            if (!TextUtils.isEmpty(fixedMobile)) {
+                for (String tag : tags) {
+                    if (fixedMobile.startsWith(tag)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -74,26 +81,39 @@ public class CallFilter {
     }
 
     public void add(String value) {
-        try {
-            Integer tag = Integer.parseInt(fix(value));
-            if (tag != 0 && !tags.contains(tag)) {
+        tryCatch(() -> {
+            String tag = fix(value);
+            if (!TextUtils.isEmpty(tag) && !tags.contains(tag)) {
                 tags.add(tag);
                 SharePreferenceUtils.setCallList(new Gson().toJson(tags));
             }
-        } catch (Exception ex) {
-            LogUtils.log(ex.getMessage());
-        }
+        });
+    }
+
+    public void addPreFix(String value) {
+        tryCatch(() -> {
+            if (!TextUtils.isEmpty(value) && !preFixs.contains(value)) {
+                preFixs.add(value);
+                SharePreferenceUtils.setCallPreFix(new Gson().toJson(preFixs));
+            }
+        });
     }
 
     public void del(String value) {
-        try {
-            Integer tag = Integer.parseInt(fix(value));
-            if (tag != 0 && tags.remove(tag)) {
+        tryCatch(() -> {
+            String tag = fix(value);
+            if (!TextUtils.isEmpty(tag) && tags.remove(tag)) {
                 SharePreferenceUtils.setCallList(new Gson().toJson(tags));
             }
-        } catch (Exception ex) {
-            LogUtils.log(ex.getMessage());
-        }
+        });
+    }
+
+    public void delPreFix(String value) {
+        tryCatch(() -> {
+            if (!TextUtils.isEmpty(value) && preFixs.remove(value)) {
+                SharePreferenceUtils.setCallPreFix(new Gson().toJson(preFixs));
+            }
+        });
     }
 
     //过滤无效的前缀，+,86,0，得到一个正常的号码
@@ -111,6 +131,14 @@ public class CallFilter {
         } catch (Exception ex) {
             LogUtils.log(ex.getMessage());
         }
-        return "0";
+        return null;
+    }
+
+    private void tryCatch(Runnable next) {
+        try {
+            next.run();
+        } catch (Exception ex) {
+            LogUtils.log(ex.getMessage());
+        }
     }
 }

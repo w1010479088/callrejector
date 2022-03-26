@@ -12,6 +12,7 @@ public class SharePreferenceUtils {
 
     private static final String KEY_INTERRUPT = "need_interrupt";
     private static final String KEY_CALL_LIST = "call_list";
+    private static final String KEY_CALL_PRE_FIX = "call_prefix";
 
     static {
         preferences = App.getInstance().getSharedPreferences(KEY, Context.MODE_PRIVATE);
@@ -31,6 +32,14 @@ public class SharePreferenceUtils {
 
     public static void setCallList(String value) {
         put(KEY_CALL_LIST, value);
+    }
+
+    public static String getCallPreFix() {
+        return getString(KEY_CALL_PRE_FIX);
+    }
+
+    public static void setCallPreFix(String value) {
+        put(KEY_CALL_PRE_FIX, value);
     }
 
     //-------------------------------------我是分割线-------------------------------------------

@@ -34,13 +34,40 @@
         android:background="@color/black" />
 
     <TextView
+        android:id="@+id/addPreFix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:drawableEnd="@drawable/add"
+        android:gravity="center_vertical"
+        android:text="添加通用前缀"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/black" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listPreFix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="10dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/black" />
+
+    <TextView
         android:id="@+id/add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:drawableEnd="@drawable/add"
         android:gravity="center_vertical"
-        android:text="添加"
+        android:text="添加黑名单前缀"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
