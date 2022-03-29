@@ -24,3 +24,4 @@
 # ViewHolder需要的混淆配置 recyclerviewconfig,现在的RecyclerView已经属于SDK里面的东西了,需要注意
 -keep class com.bruceewu.configor.**{*;}
 -keep class android.view.View
+-keep class com.bruceewu.callrejector.ui.**{*;}
