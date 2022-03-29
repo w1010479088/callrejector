@@ -22,11 +22,7 @@ public class NotificationHelper {
                 .setAutoCancel(true)
                 .setContentText(title)
                 .setTicker(title);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.mipmap.ic_launcher);
-        } else {
-            builder.setSmallIcon(R.mipmap.ic_launcher);
-        }
+        builder.setSmallIcon(R.drawable.ic_launcher);
         notificationManager.notify(DOWNLOAD_NOTIFICATION_ID++, builder.build());
         if (DOWNLOAD_NOTIFICATION_ID > 100) {
             DOWNLOAD_NOTIFICATION_ID = 0;
