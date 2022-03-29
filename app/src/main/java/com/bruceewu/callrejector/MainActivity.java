@@ -35,12 +35,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        ((Switch) findViewById(R.id.open)).setChecked(SharePreferenceUtils.needInterrupt());
-        ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> SharePreferenceUtils.setInterrupt(isChecked));
-        checkNormalPermission(() -> checkSinglePermission(() -> {
-        }));
+        Runnable errorAction = () -> {
+            SharePreferenceUtils.setInterrupt(false);
+            refreshSwitch();
+        };
+        refreshSwitch();
+        ((Switch) findViewById(R.id.open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharePreferenceUtils.setInterrupt(isChecked);
+            if (isChecked) {
+                checkNormalPermission(() -> checkSinglePermission(() -> {
+                }, errorAction), errorAction);
+            }
+        });
         findViewById(R.id.add).setOnClickListener(v -> add());
         findViewById(R.id.addPreFix).setOnClickListener(v -> addPreFix());
+    }
+
+    private void refreshSwitch() {
+        ((Switch) findViewById(R.id.open)).setChecked(SharePreferenceUtils.needInterrupt());
     }
 
 
@@ -141,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     //--------------------------------------权限相关------------------------------------------
 
     @SuppressLint("CheckResult")
-    private void checkNormalPermission(Runnable next) {
+    private void checkNormalPermission(Runnable next, Runnable error) {
         new RxPermissions(this)
                 .request(
                         Manifest.permission.READ_PHONE_STATE,
@@ -153,15 +165,17 @@ public class MainActivity extends AppCompatActivity {
                     if (grant) {
                         next.run();
                     } else {
+                        error.run();
                         ToastUtils.show("获取权限失败！");
                     }
-                }, error -> {
-                    ToastUtils.show(error.getMessage());
+                }, err -> {
+                    error.run();
+                    ToastUtils.show(err.getMessage());
                 });
     }
 
     @SuppressLint("CheckResult")
-    private void checkSinglePermission(Runnable next) {
+    private void checkSinglePermission(Runnable next, Runnable error) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             new RxPermissions(this)
                     .request(Manifest.permission.ANSWER_PHONE_CALLS
@@ -171,10 +185,12 @@ public class MainActivity extends AppCompatActivity {
                         if (grant) {
                             next.run();
                         } else {
+                            error.run();
                             ToastUtils.show("获取权限失败！");
                         }
-                    }, error -> {
-                        ToastUtils.show(error.getMessage());
+                    }, err -> {
+                        error.run();
+                        ToastUtils.show(err.getMessage());
                     });
         } else {
             next.run();

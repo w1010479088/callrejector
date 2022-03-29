@@ -22,22 +22,19 @@ public class CallRejector {
     private Context context;
     private final TelephonyManager manager;
 
-    private final CallListener listener = new CallListener(mobile -> {
-        LogUtils.log(mobile);
-        DoubleClickHelper.click("listener", () -> {
-            if (SharePreferenceUtils.needInterrupt()) {//是否需要拦截
-                CallFilter.filter(mobile, () -> {
+    private final CallListener listener = new CallListener(mobile ->
+            checkOpen(() -> {
+                LogUtils.log(mobile);
+                DoubleClickHelper.click("listener", () -> CallFilter.filter(mobile, () -> {
                     reject();
                     if (context != null) {
                         NotificationHelper.show(context, String.format("已帮您拦截号码：%s", mobile));
                     }
-                });
-            }
-        });
-    });
+                }));
+            }));
 
     public static void newInstance(Context context) {
-        DoubleClickHelper.click("newInstance", () -> new CallRejector(context));
+        checkOpen(() -> DoubleClickHelper.click("newInstance", () -> new CallRejector(context)));
     }
 
     private CallRejector(Context context) {
@@ -94,6 +91,12 @@ public class CallRejector {
             LogUtils.log("拒接成功！");
         } catch (Exception e) {
             LogUtils.log("拒接失败！" + e.getMessage());
+        }
+    }
+
+    private static void checkOpen(Runnable next) {
+        if (SharePreferenceUtils.needInterrupt()) {
+            next.run();
         }
     }
 
