@@ -25,3 +25,7 @@
 -keep class com.bruceewu.configor.**{*;}
 -keep class android.view.View
 -keep class com.bruceewu.callrejector.ui.**{*;}
+
+##AIDL相关的混淆
+-keep class android.telephony.**{*;}
+-keep class com.android.internal.telephony.**{*;}
