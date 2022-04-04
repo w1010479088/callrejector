@@ -80,9 +80,8 @@ public class CallFilter {
         return false;
     }
 
-    public void add(String value) {
+    public void add(String tag) {
         tryCatch(() -> {
-            String tag = fix(value);
             if (!TextUtils.isEmpty(tag) && !tags.contains(tag)) {
                 tags.add(tag);
                 SharePreferenceUtils.setCallList(new Gson().toJson(tags));
@@ -99,9 +98,8 @@ public class CallFilter {
         });
     }
 
-    public void del(String value) {
+    public void del(String tag) {
         tryCatch(() -> {
-            String tag = fix(value);
             if (!TextUtils.isEmpty(tag) && tags.remove(tag)) {
                 SharePreferenceUtils.setCallList(new Gson().toJson(tags));
             }
@@ -117,21 +115,20 @@ public class CallFilter {
     }
 
     //过滤无效的前缀，+,86,0，得到一个正常的号码
-    private String fix(String value) {
+    private String fix(String mobile) {
         try {
-            if (!TextUtils.isEmpty(value)) {
-                String tag = value;
+            if (!TextUtils.isEmpty(mobile)) {
                 for (String preFix : preFixs) {
-                    if (tag.startsWith(preFix)) {
-                        tag = tag.replaceFirst(preFix, "");
+                    if (mobile.startsWith(preFix)) {
+                        String fixedMobile = mobile.replaceFirst(preFix, "");
+                        return fix(fixedMobile);
                     }
                 }
-                return tag;
             }
         } catch (Exception ex) {
             LogUtils.log(ex.getMessage());
         }
-        return null;
+        return mobile;
     }
 
     private void tryCatch(Runnable next) {
